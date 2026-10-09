@@ -1831,3 +1831,15 @@ function runGPSDetection(triggerElement, textSelector, loadingText, defaultText,
     }
   );
 }
+
+// Keyboard shortcut: Press "/" to focus search box
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+    e.preventDefault();
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+      searchInput.focus();
+      searchInput.select();
+    }
+  }
+});
