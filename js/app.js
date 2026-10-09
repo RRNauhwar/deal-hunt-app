@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (uAvatar) {
           const initial = displayName.slice(0, 1).toUpperCase();
           uAvatar.innerHTML = u.photoURL 
-            ? `<img src="${u.photoURL}" alt="" style="width:100%;height:100%;object-fit:cover;"/>` 
+            ? `<img src="${u.photoURL}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"/>` 
             : `<span>${initial}</span>`;
         }
       } else {

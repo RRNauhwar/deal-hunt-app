@@ -182,9 +182,9 @@ html[data-theme="day"] .topbar {
 }
 
 .brand-icon-box {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: linear-gradient(135deg, var(--brand-violet), #4F46E5);
   display: flex;
   align-items: center;
@@ -200,7 +200,7 @@ html[data-theme="day"] .topbar {
 
 .brand-text {
   font-family: 'Archivo Black', sans-serif;
-  font-size: 22px;
+  font-size: 19px;
   letter-spacing: -0.03em;
   color: var(--text-primary);
   display: flex;
@@ -221,6 +221,30 @@ html[data-theme="day"] .topbar {
   border-radius: 4px;
   margin-left: 6px;
   letter-spacing: 0.5px;
+}
+
+/* User Profile Avatar Sizing */
+#u-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--brand-violet);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+#u-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  display: block !important;
 }
 
 /* Center Navigation Links */

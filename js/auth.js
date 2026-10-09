@@ -61,7 +61,7 @@ function syncNavUI(user, profile) {
     userMenu.style.display = "flex";
     if (avatarEl) {
       avatarEl.innerHTML = user.photoURL
-        ? `<img src="${user.photoURL}" alt=""/>`
+        ? `<img src="${user.photoURL}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"/>`
         : `<span>${(user.displayName || user.email || "U")
             .slice(0, 2)
             .toUpperCase()}</span>`;
