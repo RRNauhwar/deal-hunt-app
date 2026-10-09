@@ -3,87 +3,270 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DealHunt — Fresh deals, scored by the crowd</title>
+    <title>DealHunt — Stop searching everywhere. Find the deal worth taking.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/style.css?v=2.0" />
+    <link rel="stylesheet" href="css/style.css?v=3.0" />
   </head>
   <body>
+    <!-- NAVIGATION BAR -->
     <header class="topbar">
       <div class="topbar-inner">
-        <div class="brand"><span class="stamp-mark">%</span>DEAL<span>HUNT</span></div>
-        <div class="search-wrap">
-          <input id="searchInput" type="text" placeholder="Search deals, stores, coupons…" />
+        <!-- Brand Logo -->
+        <a href="#" class="brand-link" id="brandLogoLink">
+          <div class="brand-icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="11" y1="8" x2="11" y2="14"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+          </div>
+          <div class="brand-text">DEAL<span>HUNT</span> <span class="brand-badge">PRO</span></div>
+        </a>
+
+        <!-- Main Nav Links (Desktop) -->
+        <nav class="main-nav" style="display: flex; gap: 4px;">
+          <a href="#" class="nav-link active" id="nav-home">Home</a>
+          <a href="#feed" class="nav-link" id="nav-explore">Explore Deals</a>
+          <a href="#platforms-section" class="nav-link" id="nav-platforms">Platforms</a>
+          <a href="#savings-section" class="nav-link" id="nav-features">Why DealHunt</a>
+        </nav>
+
+        <!-- Search Bar in Header -->
+        <div class="header-search">
+          <span class="header-search-icon">🔍</span>
+          <input id="searchInput" type="text" placeholder="Search products, restaurants, coupons…" />
+          <span class="header-kbd">/</span>
         </div>
-        <div class="locale-wrap">
-          <button class="locale-chip" id="localeBtn">
-            <span class="dot"></span><span class="label" id="localeLabel">Detecting location…</span> ▾
+
+        <!-- Right Header Controls -->
+        <div class="header-actions">
+          <!-- Saved Deals Chip -->
+          <button class="saved-chip-btn" id="btnNavSaved" title="View Saved Deals">
+            🔖 <span>Saved</span> <span class="saved-badge-count" id="savedNavCount">0</span>
           </button>
-          <div class="locale-dropdown" id="localeDropdown">
-            <input type="text" id="areaSearch" placeholder="Search your area…" />
-            <div id="areaSuggestions">
-              <!-- Autocomplete suggestions dynamic -->
+
+          <!-- Location Selector -->
+          <div class="locale-wrap">
+            <button class="locale-chip" id="localeBtn">
+              <span class="dot"></span><span class="label" id="localeLabel">Location</span> ▾
+            </button>
+            <div class="locale-dropdown" id="localeDropdown">
+              <input type="text" id="areaSearch" placeholder="Search your area or city…" />
+              <div id="areaSuggestions"></div>
             </div>
           </div>
-        </div>
-        <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
-        
-        <!-- Dropdown Menu / User Avatar -->
-        <div id="user-menu" style="display: none; align-items: center; gap: 8px;">
-          <div class="locale-chip" id="userPill" style="cursor: pointer; border-style: solid; border-color: var(--line); color: var(--ink);">
-            <div id="u-avatar" style="width: 20px; height: 20px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--line); font-size: 10px; font-weight: 700;"></div>
-            <span id="u-name"></span>
+
+          <!-- Theme Toggle Button -->
+          <button class="icon-btn" id="themeToggle" title="Toggle dark/light mode">🌙</button>
+
+          <!-- User Session Menu / Sign-In Button -->
+          <div id="user-menu" style="display: none; align-items: center; gap: 8px;">
+            <div class="locale-chip" id="userPill" style="cursor: pointer; border-style: solid; border-color: var(--border-color); color: var(--text-main);">
+              <div id="u-avatar" style="width: 22px; height: 22px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--brand-violet); color: white; font-size: 10px; font-weight: 800;"></div>
+              <span id="u-name"></span>
+            </div>
           </div>
+          <button class="btn-signin-nav" id="btn-signin">Sign In</button>
+          <button class="admin-link" id="openAdmin" style="display: none;">Admin</button>
         </div>
-        
-        <button class="btn-ghost" id="btn-signin" style="padding: 7px 12px; font-size: 12px; height: 32px; display: flex; align-items: center;">Sign In</button>
-        <button class="admin-link" id="openAdmin" style="display: none;">Admin</button>
       </div>
     </header>
 
     <div class="shell">
-      <div class="hero-wrap">
-        <p class="hero-eyebrow">Deal of the Day</p>
+      <!-- HERO SECTION -->
+      <section class="hero-section">
+        <div class="hero-banner-card">
+          <div class="hero-content">
+            <div class="hero-tag-badge">⚡ SMART SAVINGS PLATFORM</div>
+            <h1 class="hero-heading">Your next great deal is closer than you think.</h1>
+            <p class="hero-subhead">Discover smarter savings across food, shopping, everyday essentials, and local favorites scored live by the community.</p>
+
+            <!-- Prominent Hero Search Box -->
+            <div class="hero-search-box">
+              <span style="font-size: 18px; color: var(--text-muted);">🔍</span>
+              <input id="heroSearchInput" type="text" placeholder="Search products, restaurants, brands, or deals..." />
+              <button class="hero-search-btn" id="heroSearchSubmit">Search Deals</button>
+            </div>
+
+            <!-- Quick Category Shortcuts -->
+            <div class="category-shortcuts" id="categoryShortcuts">
+              <button type="button" class="shortcut-chip active" data-cat="all">🔥 All</button>
+              <button type="button" class="shortcut-chip" data-cat="food">🍜 Food</button>
+              <button type="button" class="shortcut-chip" data-cat="groceries">🛒 Groceries</button>
+              <button type="button" class="shortcut-chip" data-cat="electronics">💻 Electronics</button>
+              <button type="button" class="shortcut-chip" data-cat="clothes">👕 Fashion</button>
+              <button type="button" class="shortcut-chip" data-cat="other">📦 Essentials</button>
+            </div>
+
+            <div class="hero-trust-bar">
+              <span class="hero-trust-dot"></span>
+              <span>Comparing live offers across Swiggy, Zomato, Blinkit, Amazon, Flipkart & local merchants.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURED SPOTLIGHT DEAL OF THE DAY -->
+      <div class="hero-wrap" style="padding-top: 0;">
+        <div class="hero-eyebrow">FEATURED SPOTLIGHT</div>
         <div class="hero-card" id="heroCard">
-          <!-- Deal of the day dynamic -->
+          <!-- Dynamically populated top score deal -->
         </div>
         <div class="stats-strip" id="statsStrip">
-          <!-- Live metrics dynamic -->
+          <!-- Live metrics tally dynamic -->
         </div>
       </div>
 
-      <nav class="sort-bar">
-        <div class="sort-tabs">
-          <select id="sortSelect">
-            <option value="score">🔥 Hottest</option>
-            <option value="savings">Highest Savings</option>
-            <option value="priceLow">Price: Low to High</option>
-            <option value="priceHigh">Price: High to Low</option>
-            <option value="ratings">★ Ratings</option>
-            <option value="nearest">📍 Nearest First</option>
-          </select>
+      <!-- TRENDING PLATFORMS SECTION -->
+      <section id="platforms-section" style="padding: 10px 0 30px;">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Find deals on your favorite platforms</h2>
+            <p class="section-subtitle">Explore discount streams filtered by merchant network</p>
+          </div>
         </div>
-        <div class="source-filter" id="sourceFilter">
-          <button data-filter="all" class="active">All</button>
-          <button data-filter="community">👥 Community</button>
-          <button data-filter="telegram_scraped">⚡ Auto-found</button>
-          <button data-filter="saved">🔖 Saved only</button>
+        <div class="platforms-grid" id="platformsGrid">
+          <div class="platform-tile" data-platform="Swiggy">
+            <div class="platform-icon" style="background: rgba(252, 128, 25, 0.12); color: #FC8019;">🍕</div>
+            <h3 class="platform-name">Swiggy</h3>
+            <span class="platform-count">Food & Gourmet</span>
+          </div>
+          <div class="platform-tile" data-platform="Zomato">
+            <div class="platform-icon" style="background: rgba(226, 55, 68, 0.12); color: #E23744;">🍔</div>
+            <h3 class="platform-name">Zomato</h3>
+            <span class="platform-count">Dining & Coupons</span>
+          </div>
+          <div class="platform-tile" data-platform="Blinkit">
+            <div class="platform-icon" style="background: rgba(247, 206, 70, 0.15); color: #D97706;">⚡</div>
+            <h3 class="platform-name">Blinkit</h3>
+            <span class="platform-count">Quick Commerce</span>
+          </div>
+          <div class="platform-tile" data-platform="Amazon">
+            <div class="platform-icon" style="background: rgba(255, 153, 0, 0.12); color: #FF9900;">📦</div>
+            <h3 class="platform-name">Amazon</h3>
+            <span class="platform-count">Electronics & Retail</span>
+          </div>
+          <div class="platform-tile" data-platform="Flipkart">
+            <div class="platform-icon" style="background: rgba(40, 116, 240, 0.12); color: #2874F0;">🛍️</div>
+            <h3 class="platform-name">Flipkart</h3>
+            <span class="platform-count">Big Savings</span>
+          </div>
+          <div class="platform-tile" data-platform="Store (Offline)">
+            <div class="platform-icon" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">🏪</div>
+            <h3 class="platform-name">Local Outlets</h3>
+            <span class="platform-count">Nearby Stores</span>
+          </div>
         </div>
-      </nav>
+      </section>
 
-      <main class="feed" id="feed">
-        <!-- Cards dynamic -->
-      </main>
+      <!-- SMART SAVINGS VALUE CARDS SECTION -->
+      <section id="savings-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Spend smarter. Keep more.</h2>
+            <p class="section-subtitle">How DealHunt powers your everyday savings discovery</p>
+          </div>
+        </div>
+        <div class="smart-savings-grid">
+          <div class="savings-feature-card">
+            <div class="feature-icon-bubble">🔍</div>
+            <h3 class="feature-title">Discover</h3>
+            <p class="feature-desc">Find curated discounts and active promo codes without visiting multiple websites manually.</p>
+          </div>
+          <div class="savings-feature-card">
+            <div class="feature-icon-bubble">📊</div>
+            <p class="feature-title">Compare</p>
+            <p class="feature-desc">Evaluate available offers using their actual price drops, community upvotes, and verification metrics.</p>
+          </div>
+          <div class="savings-feature-card">
+            <div class="feature-icon-bubble">🔖</div>
+            <h3 class="feature-title">Save</h3>
+            <p class="feature-desc">Bookmark useful deals to your personal collection and access direct merchant checkout instantly.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- DEALS FEED SECTION & FILTER BAR -->
+      <section id="feed-section">
+        <div class="section-header" style="margin-bottom: 0;">
+          <div>
+            <h2 class="section-title">Deals worth your attention <span id="feed-count" style="color: var(--brand-violet); font-size: 18px;">(0)</span></h2>
+            <p class="section-subtitle">Ranked by crowd dynamic score and real savings percent</p>
+          </div>
+        </div>
+
+        <nav class="sort-bar">
+          <div class="sort-tabs">
+            <select class="sort-select" id="sortSelect">
+              <option value="score">🔥 Hottest Deals</option>
+              <option value="savings">Highest Savings</option>
+              <option value="priceLow">Price: Low to High</option>
+              <option value="priceHigh">Price: High to Low</option>
+              <option value="ratings">★ Best Rated</option>
+              <option value="nearest">📍 Nearest First</option>
+            </select>
+          </div>
+          <div class="filter-chips-row" id="sourceFilter">
+            <button data-filter="all" class="filter-chip active">All Deals</button>
+            <button data-filter="community" class="filter-chip">👥 Community</button>
+            <button data-filter="telegram_scraped" class="filter-chip">⚡ Auto-found</button>
+            <button data-filter="saved" class="filter-chip">🔖 Saved only</button>
+          </div>
+        </nav>
+
+        <!-- MAIN FEED CARDS GRID -->
+        <main class="feed" id="feed">
+          <!-- Cards dynamically populated by js/app.js -->
+        </main>
+      </section>
     </div>
 
+    <!-- FLOATING ACTION BUTTON (SHARE A DEAL) -->
     <button class="fab" id="shareFab">＋ Share a Deal</button>
 
+    <!-- FOOTER -->
     <footer class="site-footer">
-      DealHunt — community deals, scored fresh every hour.
-      <span class="mono">score = discount% + upvotes×5 + stars×10 + trust − expired×15, decaying 2.5pt/hr</span>
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="brand-text" style="font-size: 20px;">DEAL<span>HUNT</span></div>
+          <p>The community-powered deal discovery engine. Discover, compare, and save across food, electronics, groceries, and local stores.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#feed">Explore Deals</a></li>
+            <li><a href="#platforms-section">Platforms</a></li>
+            <li><a href="#savings-section">Why DealHunt</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="#feed" onclick="window._filterCat('food')">Food Delivery</a></li>
+            <li><a href="#feed" onclick="window._filterCat('groceries')">Quick Groceries</a></li>
+            <li><a href="#feed" onclick="window._filterCat('electronics')">Electronics</a></li>
+            <li><a href="#feed" onclick="window._filterCat('clothes')">Fashion</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal & Safety</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Community Guidelines</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 DealHunt Platform. All rights reserved.</span>
+        <span class="mono" style="font-size: 11px;">score = discount% + upvotes×5 + stars×10 + trust − flags×15 (2.5 pt/hr decay)</span>
+      </div>
     </footer>
 
     <!-- AUTH MODAL -->
@@ -92,13 +275,12 @@
         <div class="modal-head">
           <div>
             <h2 id="auth-modal-title">Sign In to DealHunt</h2>
-            <p>Unlock posting, upvoting, comments, and ratings.</p>
+            <p>Unlock posting, upvoting, comments, and saved deals.</p>
           </div>
           <button class="modal-close" data-close="auth-modal">✕</button>
         </div>
         <div class="modal-body">
-          <!-- Google Login Button -->
-          <button class="affiliate-btn" id="btn-google-auth" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 18px; margin-left: 0; margin-right: 0;">
+          <button class="affiliate-btn" id="btn-google-auth" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 16px 0;">
             <svg width="18" height="18" viewBox="0 0 18 18">
               <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
               <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
@@ -108,12 +290,11 @@
             Continue with Google
           </button>
           
-          <div class="auth-divider" id="auth-divider" style="text-align: center; color: var(--ink-soft); font-size: 12px; margin: 15px 0; position: relative;">
-            <span style="background: var(--paper-raised); padding: 0 10px; position: relative; z-index: 1; font-family:'JetBrains Mono',monospace;" id="auth-divider-text">or sign in with email</span>
-            <div style="position: absolute; top: 50%; left: 0; right: 0; border-bottom: 1.5px dashed var(--line); z-index: 0;"></div>
+          <div class="auth-divider" id="auth-divider" style="text-align: center; color: var(--text-muted); font-size: 12px; margin: 15px 0; position: relative;">
+            <span style="background: var(--card-bg); padding: 0 10px; position: relative; z-index: 1; font-family:'JetBrains Mono',monospace;" id="auth-divider-text">or sign in with email</span>
+            <div style="position: absolute; top: 50%; left: 0; right: 0; border-bottom: 1px dashed var(--border-color); z-index: 0;"></div>
           </div>
 
-          <!-- Email Password Fields -->
           <div class="form-grid">
             <div class="field full" id="auth-name-fg">
               <label>Name</label>
@@ -129,9 +310,9 @@
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-            <a href="#" id="auth-switch" style="font-size: 13px; color: var(--teal); font-weight: 500;">Don't have an account? Sign Up</a>
-            <button class="btn-primary" id="btn-auth-submit" style="padding: 9px 18px; font-size: 13px;">Sign In</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px;">
+            <a href="#" id="auth-switch" style="font-size: 13px; color: var(--brand-violet); font-weight: 600;">Don't have an account? Sign Up</a>
+            <button class="btn-primary" id="btn-auth-submit" style="padding: 10px 20px; font-size: 13px;">Sign In</button>
           </div>
         </div>
       </div>
@@ -194,7 +375,7 @@
               </div>
               <div class="field">
                 <label>Coupon code (optional)</label>
-                <input id="f-coupon" placeholder="e.g. save60" style="text-transform: uppercase;" />
+                <input id="f-coupon" placeholder="e.g. SAVE60" style="text-transform: uppercase;" />
               </div>
               <div class="field">
                 <label>GST / delivery fees (optional)</label>
@@ -207,7 +388,7 @@
                     <input required id="f-location" placeholder="e.g. Sector 17, Chandigarh" autocomplete="off" />
                     <div class="locale-dropdown" id="pd-loc-box" style="width: 100%; top: 100%;"></div>
                   </div>
-                  <button type="button" class="locale-chip" id="pd-detect-loc" style="height: 38px; border-radius: var(--radius);">📍 Detect</button>
+                  <button type="button" class="locale-chip" id="pd-detect-loc" style="height: 38px; border-radius: var(--radius-sm);">📍 Detect</button>
                 </div>
               </div>
               <div class="field full">
@@ -250,7 +431,6 @@
           <button data-pane="logs" id="btn-tab-logs">Scraper system logs</button>
         </div>
 
-        <!-- Tab 1: Pending Reviews -->
         <div class="admin-pane active" id="pane-review">
           <table class="admin-table">
             <thead>
@@ -262,17 +442,14 @@
                 <th></th>
               </tr>
             </thead>
-            <tbody id="reviewTbody">
-              <!-- Pending deals dynamic -->
-            </tbody>
+            <tbody id="reviewTbody"></tbody>
           </table>
         </div>
 
-        <!-- Tab 2: Telegram Channels Registry -->
         <div class="admin-pane" id="pane-sources">
           <div class="add-channel-row">
             <input type="text" id="newChannelInput" placeholder="@channel_handle" />
-            <input type="text" id="newChannelName" placeholder="Channel Name" style="padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font-family: inherit; font-size: 13px;" />
+            <input type="text" id="newChannelName" placeholder="Channel Name" />
             <button id="addChannelBtn">Add channel</button>
           </div>
           <table class="admin-table">
@@ -284,13 +461,10 @@
                 <th></th>
               </tr>
             </thead>
-            <tbody id="channelsTbody">
-              <!-- Scraping sources dynamic -->
-            </tbody>
+            <tbody id="channelsTbody"></tbody>
           </table>
         </div>
 
-        <!-- Tab 3: System Scraping Logs -->
         <div class="admin-pane" id="pane-logs">
           <table class="admin-table">
             <thead>
@@ -302,9 +476,7 @@
                 <th>Details</th>
               </tr>
             </thead>
-            <tbody id="logsTbody">
-              <!-- Logs dynamic -->
-            </tbody>
+            <tbody id="logsTbody"></tbody>
           </table>
         </div>
       </div>
@@ -324,13 +496,9 @@
         <span class="icon">🔍</span>
         <span class="label">Search</span>
       </button>
-      <button class="nav-item" id="mob-admin" style="display: none;">
-        <span class="icon">🛡️</span>
-        <span class="label">Admin</span>
-      </button>
-      <button class="nav-item" id="mob-profile">
-        <span class="icon">👤</span>
-        <span class="label">Account</span>
+      <button class="nav-item" id="mob-saved">
+        <span class="icon">🔖</span>
+        <span class="label">Saved</span>
       </button>
     </nav>
 
@@ -343,7 +511,7 @@
     <div class="chat-drawer" id="chatDrawer">
       <div class="chat-header">
         <div class="chat-title-row">
-          <span class="avatar">✨</span>
+          <div class="avatar">✨</div>
           <div>
             <h3>DealHunt AI Assistant</h3>
             <p>● Online · Savings Mode</p>
@@ -355,30 +523,26 @@
         </div>
       </div>
 
-      <!-- QUICK ACTION CHIPS -->
       <div class="chat-chips" id="chatChips">
         <button type="button" class="chip" data-query="Recommend the best deals live today.">🔥 Top Picks</button>
         <button type="button" class="chip" data-query="Are there any coupon codes for Swiggy or Zomato?">🎟️ Coupons</button>
         <button type="button" class="chip" data-query="Find deals near my location.">📍 Nearby</button>
         <button type="button" class="chip" data-query="Compare the prices of live deals.">📊 Compare</button>
-        <button type="button" class="chip" data-query="Should I buy a smartphone today or wait for Big Billion Days?">📈 Price Trend</button>
-        <button type="button" class="chip" data-query="Optimize my cart for maximum savings.">🛒 Optimizer</button>
       </div>
 
       <div class="chat-messages" id="chatMessages">
         <div class="message bot">
           Hey there! 👋 I'm your <strong>DealHunt AI Assistant</strong>.<br><br>
-          Ask me about deals, coupons, price drops, or product comparisons. Upload a bill to find savings, or just talk to me!
+          Ask me about deals, coupons, price drops, or product comparisons across Swiggy, Zomato, Amazon, Flipkart, and Blinkit!
         </div>
       </div>
 
-      <!-- IMAGE PREVIEW -->
       <div class="chat-preview-box" id="chatPreviewBox" style="display:none;">
         <div class="preview-item" style="display:flex;align-items:center;gap:10px;">
-          <img id="chatPreviewImg" src="" alt="preview" style="height:36px;width:36px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.1);">
+          <img id="chatPreviewImg" src="" alt="preview" style="height:36px;width:36px;object-fit:cover;border-radius:8px;">
           <span style="font-size:12px;font-weight:600;color:#94a3b8;">Image attached</span>
         </div>
-        <button type="button" class="remove-btn" id="chatRemoveImg" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;">✕</button>
+        <button type="button" class="remove-btn" id="chatRemoveImg" style="background:var(--status-error);color:white;border:none;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;">✕</button>
       </div>
 
       <form class="chat-input-form" id="chatInputForm">
@@ -393,14 +557,6 @@
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
-    <script>
-      function closeAllModals() {
-        document.querySelectorAll(".modal-overlay").forEach((m) =>
-          m.classList.remove("open")
-        );
-        document.body.style.overflow = "";
-      }
-    </script>
-    <script type="module" src="js/app.js?v=2.0"></script>
+    <script type="module" src="js/app.js?v=3.0"></script>
   </body>
 </html>

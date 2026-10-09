@@ -352,8 +352,6 @@ function card(d) {
 
   return `
   <article class="deal-card" data-cat="${d.category}" data-id="${d.id}" style="cursor: pointer;" onclick="window._openComments(event,'${d.id}')">
-    <div class="perforation"></div>
-    <div class="tag-punch">-${pct}%</div>
     <div class="card-top" onclick="event.stopPropagation()">
       <div class="badge-row">${badges}</div>
       <span class="time-chip">${timeLabel}</span>
@@ -365,18 +363,19 @@ function card(d) {
       <p class="deal-loc">📍 ${escH(d.area || "Online")}${distLabel}</p>
       
       ${d.imageUrl ? `
-      <div class="card-img-wrap" style="margin: 6px 0 10px 0; border-radius: var(--radius); overflow: hidden; max-height: 180px; display: flex; align-items: center; justify-content: center; background: var(--paper);">
-        <img src="${escH(d.imageUrl)}" alt="${escH(d.title)}" style="width: 100%; height: 180px; object-fit: cover;" />
+      <div class="card-img-wrap">
+        <img src="${escH(d.imageUrl)}" alt="${escH(d.title)}" />
       </div>` : ""}
 
       ${hasPrice ? `
       <div class="price-row">
         <span class="price-final">${displayPrice}</span>
         ${d.originalPrice ? `<span class="price-orig">${fmt(d.originalPrice)}</span>` : ""}
+        ${pct > 0 ? `<span class="price-savings-badge">-${pct}% OFF</span>` : (save > 0 ? `<span class="price-savings-badge">Save ${fmt(save)}</span>` : "")}
       </div>
       ${d.gst ? `<div class="price-fee">Incl. ₹${d.gst} GST/fees</div>` : ""}
       ` : `
-      <span class="price-pctonly">-${pct}% <small>exact price not listed yet</small></span>
+      <span class="price-pctonly">-${pct}% OFF <small>exact price not listed yet</small></span>
       `}
 
       ${d.coupon ? `
@@ -392,7 +391,7 @@ function card(d) {
     </div>
 
     ${d.productLink ? `
-    <button class="affiliate-btn" onclick="window.open('${escJ(d.productLink)}', '_blank'); event.stopPropagation();" style="margin: 10px 14px 0;">
+    <button class="affiliate-btn" onclick="window.open('${escJ(d.productLink)}', '_blank'); event.stopPropagation();">
       🌐 Open Deal Link ↗
     </button>` : ""}
 
@@ -1843,3 +1842,97 @@ document.addEventListener("keydown", (e) => {
     }
   }
 });
+
+// ── Wire Interactive Layout Elements ────────────────
+function wireInteractiveLayout() {
+  // Sync Saved Deals Count Badge
+  const syncSavedBadge = () => {
+    const badge = document.getElementById("savedNavCount");
+    if (badge) badge.textContent = S.savedDeals.size;
+  };
+  window._syncSavedBtn = syncSavedBadge;
+  syncSavedBadge();
+
+  // Saved Nav Button Click
+  const btnNavSaved = document.getElementById("btnNavSaved");
+  btnNavSaved?.addEventListener("click", () => {
+    S.filterType = "saved";
+    document.querySelectorAll("#sourceFilter button").forEach(b => {
+      b.classList.toggle("active", b.dataset.filter === "saved");
+    });
+    applyAll();
+    document.getElementById("feed-section")?.scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Hero Search Box
+  const heroSearchInput = document.getElementById("heroSearchInput");
+  const heroSearchSubmit = document.getElementById("heroSearchSubmit");
+  const mainSearchInput = document.getElementById("searchInput");
+
+  const triggerSearch = () => {
+    const val = heroSearchInput?.value || mainSearchInput?.value || "";
+    S.search = val.trim();
+    if (mainSearchInput && heroSearchInput) {
+      mainSearchInput.value = val;
+      heroSearchInput.value = val;
+    }
+    applyAll();
+    document.getElementById("feed-section")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  heroSearchInput?.addEventListener("input", (e) => {
+    S.search = e.target.value.trim();
+    if (mainSearchInput) mainSearchInput.value = e.target.value;
+    applyAll();
+  });
+
+  heroSearchSubmit?.addEventListener("click", triggerSearch);
+
+  // Category Shortcuts
+  const shortcuts = document.querySelectorAll("#categoryShortcuts .shortcut-chip");
+  shortcuts.forEach(chip => {
+    chip.addEventListener("click", () => {
+      shortcuts.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      const cat = chip.dataset.cat;
+      S.filterCat = cat === "all" ? null : cat;
+      applyAll();
+      document.getElementById("feed-section")?.scrollIntoView({ behavior: "smooth" });
+    });
+  });
+
+  // Trending Platform Tiles
+  const platformTiles = document.querySelectorAll(".platform-tile");
+  platformTiles.forEach(tile => {
+    tile.addEventListener("click", () => {
+      const plat = tile.dataset.platform;
+      if (plat) {
+        S.search = plat;
+        if (mainSearchInput) mainSearchInput.value = plat;
+        if (heroSearchInput) heroSearchInput.value = plat;
+        applyAll();
+        document.getElementById("feed-section")?.scrollIntoView({ behavior: "smooth" });
+        showToast(`Filtered deals by ${plat} 🛍️`);
+      }
+    });
+  });
+
+  // Mobile Nav Saved button
+  const mobSaved = document.getElementById("mob-saved");
+  mobSaved?.addEventListener("click", () => {
+    document.querySelectorAll(".mobile-nav .nav-item").forEach(b => b.classList.remove("active"));
+    mobSaved.classList.add("active");
+    S.filterType = "saved";
+    document.querySelectorAll("#sourceFilter button").forEach(b => {
+      b.classList.toggle("active", b.dataset.filter === "saved");
+    });
+    applyAll();
+    document.getElementById("feed-section")?.scrollIntoView({ behavior: "smooth" });
+  });
+}
+
+// Initialize on DOM Ready
+document.addEventListener("DOMContentLoaded", () => {
+  wireInteractiveLayout();
+});
+setTimeout(wireInteractiveLayout, 500);
