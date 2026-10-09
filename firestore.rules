@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && isOwner(userId);
+      allow delete: if isAdmin();
+    }
+
+    // 2. Deals Collection
+    match /deals/{dealId} {
+      allow read: if resource.data.status == 'approved' || isAdmin();
+      allow create: if isSignedIn() && 
+        request.resource.data.sourceType == 'user' && 
+        request.resource.data.status == 'approved' &&
+        request.resource.data.votesCount == 0;
+        
+      allow update: if isSignedIn() && (
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votesCount', 'ratingsCount', 'ratingsAverage', 'reportsCount'])) ||
+        isAdmin()
+      );
+      
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // 3. Sub-collections (Votes, Ratings, Comments, Reports)
+    match /deals/{dealId}/votes/{voteId} {
+      allow read: if true;
+      allow create, delete: if isSignedIn() && voteId == request.auth.uid;
+    }
+    
+    match /deals/{dealId}/ratings/{ratingId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && ratingId == request.auth.uid;
+    }
+    
+    match /deals/{dealId}/comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // 4. Telegram Sources & Logs
+    match /telegramSources/{sourceId} {
+      allow read, write: if isAdmin();
+    }
+    match /scrapeLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 5. Config Collection (OpenAI keys configuration)
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

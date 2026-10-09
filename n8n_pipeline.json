@@ -1,0 +1,289 @@
+{
+  "name": "DealHunt AI Scraping Ingestion & Moderation",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "channel_post"
+        ],
+        "additionalFields": {}
+      },
+      "id": "a671cf0e-3fe1-4c28-bb7e-fde4624b54e3",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {
+          "jsonResponse": true
+        },
+        "prompt": "=Analyze the following deal message and extract clean structured data. Return ONLY a valid JSON object matching this schema, without markdown blocks:\n\n{\n  \"title\": \"Attractive, descriptive product/food title\",\n  \"platform\": \"Swiggy\" | \"Zomato\" | \"Amazon\" | \"Flipkart\" | \"Blinkit\" | \"Zepto\" | \"Myntra\" | \"Other\",\n  \"category\": \"food\" | \"electronics\" | \"clothes\" | \"groceries\" | \"other\",\n  \"originalPrice\": float (original price before coupon),\n  \"finalPrice\": float (final checkout price after discount),\n  \"discountPercent\": float (discount percent 0-100),\n  \"couponCode\": \"UPPERCASE_CODE\" or null,\n  \"productLink\": \"cleaned target retail URL\",\n  \"expiryInfo\": \"date details or null\",\n  \"terms\": \" HDFC card limits, minimum purchase etc \",\n  \"confidenceScore\": integer (0-100 score on how clear the parsing is)\n}\n\nDeal Message:\n{{ $json.channel_post.text }}"
+      },
+      "id": "e2f1839e-d30e-4be3-b9bc-1498b3f4625b",
+      "name": "OpenAI Parse Deal",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const deal = JSON.parse(inputData[0].json.choices[0].message.content);\n\n// Basic validation\nconst isValid = deal.title && deal.platform && deal.finalPrice && deal.confidenceScore > 65;\n\n// Generate URL MD5 Hash to check duplicates\nconst crypto = require('crypto');\nconst urlHash = deal.productLink ? crypto.createHash('md5').update(deal.productLink).digest('hex') : null;\n\nreturn [{\n  json: {\n    ...deal,\n    isValid,\n    urlHash,\n    rawMessageId: item.json.channel_post.message_id,\n    channelId: item.json.channel_post.chat.username\n  }\n}];"
+      },
+      "id": "d04e57fb-9fa8-4b71-9f93-e40643b185b3",
+      "name": "JS Validator & Hash",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.isValid }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "184b2efc-7832-473d-8ab6-7b43f9a715f2",
+      "name": "If Valid Deal",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "collection": "deals",
+        "where": "=urlHash == '{{ $json.urlHash }}'"
+      },
+      "id": "403d162d-cf21-4f11-8a9d-b873d6e525bb",
+      "name": "Firestore Duplicate Check",
+      "type": "n8n-nodes-base.firestore",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.length == 0 }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "97424afc-21a4-4c8d-b0de-cb732e75e119",
+      "name": "If Unique Deal",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "collection": "deals",
+        "fields": {
+          "title": "={{ $json.title }}",
+          "platform": "={{ $json.platform }}",
+          "category": "={{ $json.category }}",
+          "originalPrice": "={{ $json.originalPrice }}",
+          "finalPrice": "={{ $json.finalPrice }}",
+          "discountPercent": "={{ $json.discountPercent }}",
+          "coupon": "={{ $json.couponCode }}",
+          "productLink": "={{ $json.productLink }}",
+          "urlHash": "={{ $json.urlHash }}",
+          "confidenceScore": "={{ $json.confidenceScore }}",
+          "sourceType": "telegram_scraped",
+          "sourceTelegramChannel": "={{ $json.channelId }}",
+          "status": "pending_review",
+          "votesCount": 0,
+          "ratingsCount": 0,
+          "ratingsAverage": 0,
+          "reportsCount": 0,
+          "createdAt": "={{ new Date().toISOString() }}"
+        }
+      },
+      "id": "304f5e71-9f93-4a7b-a25e-04f7b4c6e9a8",
+      "name": "Save Pending Deal",
+      "type": "n8n-nodes-base.firestore",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_ADMIN_CHAT_ID }}",
+        "text": "=🔥 *New Automated Deal Pending Review!*\n\n📌 *Title*: {{ $json.title }}\n🏷 *Platform*: {{ $json.platform }} | *Discount*: {{ $json.discountPercent }}%\n💰 *Price*: ₹{{ $json.finalPrice }} (was ₹{{ $json.originalPrice }})\n🎟 *Coupon*: `{{ $json.coupon }}`\n🎯 *Confidence*: {{ $json.confidenceScore }}%\n\nReview & Action immediately:",
+        "replyMarkup": "={\n  \"inline_keyboard\": [\n    [\n      { \"text\": \"✅ Approve\", \"url\": \"{{ $env.N8N_APPROVE_WEBHOOK_URL }}?id={{ $json.id }}\" },\n      { \"text\": \"❌ Reject\", \"url\": \"{{ $env.N8N_REJECT_WEBHOOK_URL }}?id={{ $json.id }}\" }\n    ]\n  ]\n}"
+      },
+      "id": "cb147e7d-9fa3-4cb8-82bc-9d06bc752a1a",
+      "name": "Telegram Admin Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "collection": "scrapeLogs",
+        "fields": {
+          "status": "duplicate",
+          "channelId": "={{ $json.channelId }}",
+          "messageId": "={{ $json.rawMessageId }}",
+          "timestamp": "={{ new Date().toISOString() }}"
+        }
+      },
+      "id": "a98a0ebc-4cde-4781-a982-fdb9e2c69b2d",
+      "name": "Log Duplicate",
+      "type": "n8n-nodes-base.firestore",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "collection": "scrapeLogs",
+        "fields": {
+          "status": "validation_failed",
+          "channelId": "={{ $json.channelId }}",
+          "messageId": "={{ $json.rawMessageId }}",
+          "confidenceScore": "={{ $json.confidenceScore }}",
+          "timestamp": "={{ new Date().toISOString() }}"
+        }
+      },
+      "id": "e9c1db12-c2e3-4fba-bb8d-fdb24ef12401",
+      "name": "Log Validation Fail",
+      "type": "n8n-nodes-base.firestore",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        450
+      ]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Parse Deal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Parse Deal": {
+      "main": [
+        [
+          {
+            "node": "JS Validator & Hash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS Validator & Hash": {
+      "main": [
+        [
+          {
+            "node": "If Valid Deal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Valid Deal": {
+      "main": [
+        [
+          {
+            "node": "Firestore Duplicate Check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Validation Fail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firestore Duplicate Check": {
+      "main": [
+        [
+          {
+            "node": "If Unique Deal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Unique Deal": {
+      "main": [
+        [
+          {
+            "node": "Save Pending Deal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Pending Deal": {
+      "main": [
+        [
+          {
+            "node": "Telegram Admin Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

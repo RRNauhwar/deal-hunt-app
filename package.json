@@ -1,0 +1,15 @@
+{
+  "name": "deal-hunt-app",
+  "version": "1.0.0",
+  "description": "Deal Hunt App - AI Scraper Daemon & Utilities",
+  "main": "scripts/telegram_bot_scraper.js",
+  "scripts": {
+    "scraper": "node scripts/telegram_bot_scraper.js",
+    "setup-key": "node scripts/setup_openai_key.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "firebase": "^10.12.2",
+    "openai": "^4.52.0"
+  }
+}

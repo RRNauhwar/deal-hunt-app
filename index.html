@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="day">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DealHunt — Fresh deals, scored by the crowd</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css?v=2.0" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand"><span class="stamp-mark">%</span>DEAL<span>HUNT</span></div>
+        <div class="search-wrap">
+          <input id="searchInput" type="text" placeholder="Search deals, stores, coupons…" />
+        </div>
+        <div class="locale-wrap">
+          <button class="locale-chip" id="localeBtn">
+            <span class="dot"></span><span class="label" id="localeLabel">Detecting location…</span> ▾
+          </button>
+          <div class="locale-dropdown" id="localeDropdown">
+            <input type="text" id="areaSearch" placeholder="Search your area…" />
+            <div id="areaSuggestions">
+              <!-- Autocomplete suggestions dynamic -->
+            </div>
+          </div>
+        </div>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+        
+        <!-- Dropdown Menu / User Avatar -->
+        <div id="user-menu" style="display: none; align-items: center; gap: 8px;">
+          <div class="locale-chip" id="userPill" style="cursor: pointer; border-style: solid; border-color: var(--line); color: var(--ink);">
+            <div id="u-avatar" style="width: 20px; height: 20px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--line); font-size: 10px; font-weight: 700;"></div>
+            <span id="u-name"></span>
+          </div>
+        </div>
+        
+        <button class="btn-ghost" id="btn-signin" style="padding: 7px 12px; font-size: 12px; height: 32px; display: flex; align-items: center;">Sign In</button>
+        <button class="admin-link" id="openAdmin" style="display: none;">Admin</button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <div class="hero-wrap">
+        <p class="hero-eyebrow">Deal of the Day</p>
+        <div class="hero-card" id="heroCard">
+          <!-- Deal of the day dynamic -->
+        </div>
+        <div class="stats-strip" id="statsStrip">
+          <!-- Live metrics dynamic -->
+        </div>
+      </div>
+
+      <nav class="sort-bar">
+        <div class="sort-tabs">
+          <select id="sortSelect">
+            <option value="score">🔥 Hottest</option>
+            <option value="savings">Highest Savings</option>
+            <option value="priceLow">Price: Low to High</option>
+            <option value="priceHigh">Price: High to Low</option>
+            <option value="ratings">★ Ratings</option>
+            <option value="nearest">📍 Nearest First</option>
+          </select>
+        </div>
+        <div class="source-filter" id="sourceFilter">
+          <button data-filter="all" class="active">All</button>
+          <button data-filter="community">👥 Community</button>
+          <button data-filter="telegram_scraped">⚡ Auto-found</button>
+          <button data-filter="saved">🔖 Saved only</button>
+        </div>
+      </nav>
+
+      <main class="feed" id="feed">
+        <!-- Cards dynamic -->
+      </main>
+    </div>
+
+    <button class="fab" id="shareFab">＋ Share a Deal</button>
+
+    <footer class="site-footer">
+      DealHunt — community deals, scored fresh every hour.
+      <span class="mono">score = discount% + upvotes×5 + stars×10 + trust − expired×15, decaying 2.5pt/hr</span>
+    </footer>
+
+    <!-- AUTH MODAL -->
+    <div class="modal-overlay" id="auth-modal">
+      <div class="modal" style="max-width: 420px; width: 95%;">
+        <div class="modal-head">
+          <div>
+            <h2 id="auth-modal-title">Sign In to DealHunt</h2>
+            <p>Unlock posting, upvoting, comments, and ratings.</p>
+          </div>
+          <button class="modal-close" data-close="auth-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <!-- Google Login Button -->
+          <button class="affiliate-btn" id="btn-google-auth" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 18px; margin-left: 0; margin-right: 0;">
+            <svg width="18" height="18" viewBox="0 0 18 18">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+              <path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.956C.347 6.173 0 7.548 0 9s.347 2.827.956 4.042l3.008-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.896 11.427 0 9 0 5.482 0 2.438 2.017.956 4.958L3.964 7.29C4.672 5.164 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+          </button>
+          
+          <div class="auth-divider" id="auth-divider" style="text-align: center; color: var(--ink-soft); font-size: 12px; margin: 15px 0; position: relative;">
+            <span style="background: var(--paper-raised); padding: 0 10px; position: relative; z-index: 1; font-family:'JetBrains Mono',monospace;" id="auth-divider-text">or sign in with email</span>
+            <div style="position: absolute; top: 50%; left: 0; right: 0; border-bottom: 1.5px dashed var(--line); z-index: 0;"></div>
+          </div>
+
+          <!-- Email Password Fields -->
+          <div class="form-grid">
+            <div class="field full" id="auth-name-fg">
+              <label>Name</label>
+              <input type="text" id="auth-name" placeholder="John Doe">
+            </div>
+            <div class="field full">
+              <label>Email</label>
+              <input type="email" id="auth-email" placeholder="john@example.com">
+            </div>
+            <div class="field full">
+              <label>Password</label>
+              <input type="password" id="auth-pass" placeholder="••••••••">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+            <a href="#" id="auth-switch" style="font-size: 13px; color: var(--teal); font-weight: 500;">Don't have an account? Sign Up</a>
+            <button class="btn-primary" id="btn-auth-submit" style="padding: 9px 18px; font-size: 13px;">Sign In</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEAL DETAIL / DISCUSSION MODAL -->
+    <div class="modal-overlay" id="dealModalOverlay">
+      <div class="modal" id="dealModal">
+        <!-- Deal detail & comments dynamic -->
+      </div>
+    </div>
+
+    <!-- SHARE A DEAL MODAL -->
+    <div class="modal-overlay" id="shareModalOverlay">
+      <div class="modal">
+        <div class="modal-head">
+          <div>
+            <h2>Share a deal</h2>
+            <p>Tell other hunters what you found. It goes live right away.</p>
+          </div>
+          <button class="modal-close" data-close="shareModalOverlay">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="shareForm">
+            <div class="form-grid">
+              <div class="field full">
+                <label>Category</label>
+                <div class="cat-picker" id="catPicker">
+                  <!-- Categories dynamic -->
+                </div>
+                <input type="hidden" id="f-category" value="" />
+              </div>
+              <div class="field full">
+                <label>Deal title *</label>
+                <input required id="f-title" placeholder="e.g. 60% off everything at end-of-season sale" />
+              </div>
+              <div class="field">
+                <label>Restaurant / store name *</label>
+                <input required id="f-store" placeholder="e.g. Decathlon" />
+              </div>
+              <div class="field">
+                <label>Platform</label>
+                <select id="f-platform">
+                  <!-- Platforms dynamic -->
+                </select>
+              </div>
+              <div class="field">
+                <label>Original price (₹) *</label>
+                <input required id="f-original" type="number" min="1" placeholder="2999" />
+              </div>
+              <div class="field">
+                <label>Final price (₹) *</label>
+                <input required id="f-final" type="number" min="1" placeholder="1199" />
+              </div>
+              <div class="field full savings-row" id="savingsPreview" style="display: none;">
+                <div class="savings-preview">
+                  <span id="savingsAmt">Save ₹0</span>
+                  <span id="savingsPct">↓ 0% off</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Coupon code (optional)</label>
+                <input id="f-coupon" placeholder="e.g. save60" style="text-transform: uppercase;" />
+              </div>
+              <div class="field">
+                <label>GST / delivery fees (optional)</label>
+                <input type="number" id="f-fees" placeholder="0" min="0" />
+              </div>
+              <div class="field full">
+                <label>Location / area *</label>
+                <div style="display: flex; gap: 8px; align-items: flex-start;">
+                  <div style="flex: 1; position: relative;">
+                    <input required id="f-location" placeholder="e.g. Sector 17, Chandigarh" autocomplete="off" />
+                    <div class="locale-dropdown" id="pd-loc-box" style="width: 100%; top: 100%;"></div>
+                  </div>
+                  <button type="button" class="locale-chip" id="pd-detect-loc" style="height: 38px; border-radius: var(--radius);">📍 Detect</button>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Product link (optional)</label>
+                <input id="f-url" type="url" placeholder="https://…" />
+              </div>
+              <div class="field full">
+                <label>Tips & details (optional)</label>
+                <textarea id="f-tips" placeholder="e.g. Works on app only, stacks with bank offer"></textarea>
+              </div>
+              <div class="field full">
+                <label>Your rating for this deal</label>
+                <div class="star-input" id="formStars">
+                  <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+                </div>
+              </div>
+            </div>
+            <div class="submit-row">
+              <button type="button" class="btn-ghost" data-close="shareModalOverlay">Cancel</button>
+              <button type="submit" class="btn-primary" id="btn-post-submit">Post deal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN MODAL -->
+    <div class="modal-overlay admin-overlay" id="adminModalOverlay">
+      <div class="modal">
+        <div class="modal-head">
+          <div>
+            <h2>Moderator panel</h2>
+            <p>Review automated listings, manage scrape sources, audit logs.</p>
+          </div>
+          <button class="modal-close" data-close="adminModalOverlay">✕</button>
+        </div>
+        <div class="admin-tabs" id="adminTabs">
+          <button data-pane="review" class="active" id="btn-tab-review">Pending review</button>
+          <button data-pane="sources" id="btn-tab-sources">Telegram channels</button>
+          <button data-pane="logs" id="btn-tab-logs">Scraper system logs</button>
+        </div>
+
+        <!-- Tab 1: Pending Reviews -->
+        <div class="admin-pane active" id="pane-review">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Store</th>
+                <th>Source</th>
+                <th>AI confidence</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="reviewTbody">
+              <!-- Pending deals dynamic -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tab 2: Telegram Channels Registry -->
+        <div class="admin-pane" id="pane-sources">
+          <div class="add-channel-row">
+            <input type="text" id="newChannelInput" placeholder="@channel_handle" />
+            <input type="text" id="newChannelName" placeholder="Channel Name" style="padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font-family: inherit; font-size: 13px;" />
+            <button id="addChannelBtn">Add channel</button>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Channel</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="channelsTbody">
+              <!-- Scraping sources dynamic -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tab 3: System Scraping Logs -->
+        <div class="admin-pane" id="pane-logs">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Channel</th>
+                <th>AI confidence</th>
+                <th>Status</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="logsTbody">
+              <!-- Logs dynamic -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="mobile-nav" id="mobileNav">
+      <button class="nav-item active" id="mob-home">
+        <span class="icon">🏠</span>
+        <span class="label">Home</span>
+      </button>
+      <button class="nav-item" id="mob-post">
+        <span class="icon">＋</span>
+        <span class="label">Post</span>
+      </button>
+      <button class="nav-item" id="mob-search">
+        <span class="icon">🔍</span>
+        <span class="label">Search</span>
+      </button>
+      <button class="nav-item" id="mob-admin" style="display: none;">
+        <span class="icon">🛡️</span>
+        <span class="label">Admin</span>
+      </button>
+      <button class="nav-item" id="mob-profile">
+        <span class="icon">👤</span>
+        <span class="label">Account</span>
+      </button>
+    </nav>
+
+    <!-- CHATBOT WIDGET -->
+    <button class="chat-launcher" id="chatLauncher">
+      <span class="icon">✨</span>
+      <span class="text">AI Assistant</span>
+    </button>
+
+    <div class="chat-drawer" id="chatDrawer">
+      <div class="chat-header">
+        <div class="chat-title-row">
+          <span class="avatar">✨</span>
+          <div>
+            <h3>DealHunt AI Assistant</h3>
+            <p>● Online · Savings Mode</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="chat-toggle-btn" id="chatSpeakToggle" title="Toggle voice">🔊</button>
+          <button class="chat-close" id="chatClose">✕</button>
+        </div>
+      </div>
+
+      <!-- QUICK ACTION CHIPS -->
+      <div class="chat-chips" id="chatChips">
+        <button type="button" class="chip" data-query="Recommend the best deals live today.">🔥 Top Picks</button>
+        <button type="button" class="chip" data-query="Are there any coupon codes for Swiggy or Zomato?">🎟️ Coupons</button>
+        <button type="button" class="chip" data-query="Find deals near my location.">📍 Nearby</button>
+        <button type="button" class="chip" data-query="Compare the prices of live deals.">📊 Compare</button>
+        <button type="button" class="chip" data-query="Should I buy a smartphone today or wait for Big Billion Days?">📈 Price Trend</button>
+        <button type="button" class="chip" data-query="Optimize my cart for maximum savings.">🛒 Optimizer</button>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="message bot">
+          Hey there! 👋 I'm your <strong>DealHunt AI Assistant</strong>.<br><br>
+          Ask me about deals, coupons, price drops, or product comparisons. Upload a bill to find savings, or just talk to me!
+        </div>
+      </div>
+
+      <!-- IMAGE PREVIEW -->
+      <div class="chat-preview-box" id="chatPreviewBox" style="display:none;">
+        <div class="preview-item" style="display:flex;align-items:center;gap:10px;">
+          <img id="chatPreviewImg" src="" alt="preview" style="height:36px;width:36px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.1);">
+          <span style="font-size:12px;font-weight:600;color:#94a3b8;">Image attached</span>
+        </div>
+        <button type="button" class="remove-btn" id="chatRemoveImg" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;">✕</button>
+      </div>
+
+      <form class="chat-input-form" id="chatInputForm">
+        <button type="button" class="tool-btn" id="chatFileBtn" title="Attach image">📎</button>
+        <input type="file" id="chatFileInput" accept="image/*" style="display:none;">
+        <input type="text" id="chatInput" placeholder="Ask about deals, coupons, price drops..." autocomplete="off" required>
+        <button type="button" class="tool-btn" id="chatVoiceBtn" title="Voice input">🎤</button>
+        <button type="submit" class="send-btn">➤</button>
+      </form>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      function closeAllModals() {
+        document.querySelectorAll(".modal-overlay").forEach((m) =>
+          m.classList.remove("open")
+        );
+        document.body.style.overflow = "";
+      }
+    </script>
+    <script type="module" src="js/app.js?v=2.0"></script>
+  </body>
+</html>
