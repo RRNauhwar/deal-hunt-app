@@ -409,6 +409,8 @@ function card(d) {
 function renderSpotlight() {
   const heroCard = document.getElementById("heroCard");
   const statsStrip = document.getElementById("statsStrip");
+  const spotlightBadges = document.getElementById("spotlightBadges");
+
   if (!heroCard || !S.filtered.length) {
     if (heroCard) {
       heroCard.innerHTML = `
@@ -441,35 +443,87 @@ function renderSpotlight() {
   if (isNew && !isHot) badges += ' <span class="badge badge-new">✨ New</span>';
   if (verified) badges += ' <span class="badge badge-verified">✓ Verified</span>';
 
-  heroCard.innerHTML = `
-    <div class="ribbon">VERIFIED</div>
-    <div class="hero-icon">${cat.emoji}</div>
-    <div class="hero-body">
-      <div class="badge-row">${badges}</div>
-      <h2 class="hero-title">${escH(top.title)}</h2>
-      <p class="hero-store">${escH(top.store)} · ${escH(top.platform)} · 📍 ${escH(top.area || "Online")} · ${timeAgo(top._ts)}</p>
-      <div class="hero-price-row">
-        <span class="hero-final">${displayPrice}</span>
-        ${top.originalPrice && total > 0 ? `<span class="hero-orig">${fmt(top.originalPrice)}</span>` : ""}
-      </div>
-    </div>
-    <div class="hero-meta">
-      <div class="hero-discount">-${pct}%</div>
-      <div class="hero-score">AI score <b>${Math.round(score)}</b></div>
-    </div>`;
-  heroCard.onclick = () => window._openComments(null, top.id);
+  if (spotlightBadges) {
+    spotlightBadges.innerHTML = badges;
+  }
 
+  // Phase 4: Desktop 3-Column Grid Featured Deal
+  heroCard.innerHTML = `
+    <div class="featured-deal-card" onclick="window._openComments(null, '${top.id}')">
+      <!-- LEFT COLUMN: Image & Category -->
+      <div class="featured-left">
+        <div class="featured-img-box">
+          ${top.imageUrl ? `<img src="${escH(top.imageUrl)}" alt="${escH(top.title)}" />` : `<span class="featured-icon-placeholder">${cat.emoji}</span>`}
+        </div>
+        <span class="featured-cat-tag">${cat.emoji} ${cat.label}</span>
+      </div>
+
+      <!-- CENTER COLUMN: Title, Store, Platform, Pricing, Coupon -->
+      <div class="featured-center">
+        <div class="featured-badges-row">${badges}</div>
+        <h3 class="featured-deal-title">${escH(top.title)}</h3>
+        <p class="featured-merchant-info">🏬 ${escH(top.store)} · ${escH(top.platform)} · 📍 ${escH(top.area || "Online")} · ${timeAgo(top._ts)}</p>
+        
+        <div class="pricing-block">
+          <span class="price-current">${displayPrice}</span>
+          ${top.originalPrice && total > 0 ? `<span class="price-original">${fmt(top.originalPrice)}</span>` : ""}
+          ${pct > 0 ? `<span class="discount-badge">-${pct}% OFF</span>` : ""}
+          ${save > 0 ? `<span class="savings-amount-badge">Save ${fmt(save)}</span>` : ""}
+        </div>
+
+        ${top.coupon ? `<div class="coupon-inline-box">📋 Code: ${escH(top.coupon)}</div>` : ""}
+      </div>
+
+      <!-- RIGHT COLUMN: Score & Actions -->
+      <div class="featured-right" onclick="event.stopPropagation()">
+        <div class="featured-score-pill">Dynamic Score: <b>${Math.round(score)}</b></div>
+        <button class="btn-view-deal" onclick="window._openComments(event, '${top.id}')">
+          View Deal Details →
+        </button>
+        <button class="btn-save-secondary" onclick="window._saveDeal(event, '${top.id}')">
+          ${S.savedDeals.has(top.id) ? "🔖 Saved for Later" : "📑 Save for Later"}
+        </button>
+      </div>
+    </div>`;
+
+  // Phase 6: 4 Structured Metric Cards
   if (statsStrip) {
     const totalDeals = S.deals.length;
+    const scrapedCount = S.deals.filter(d => d.sourceType === "telegram_scraped").length;
     const avgDiscount = totalDeals > 0 
       ? Math.round(S.deals.reduce((s, d) => s + (savePct(d.originalPrice, d.finalPrice) || d.discountPercent || 0), 0) / totalDeals)
       : 0;
-    const cities = new Set(S.deals.map(d => (d.area || "").split(",").pop().trim()).filter(Boolean)).size;
+    const cities = new Set(S.deals.map(d => (d.area || "").split(",").pop().trim()).filter(Boolean)).size || 1;
+    
     statsStrip.innerHTML = `
-      <div class="stat-cell"><span class="stat-num">${totalDeals}</span><span class="stat-label">Live deals today</span></div>
-      <div class="stat-cell"><span class="stat-num">${avgDiscount}%</span><span class="stat-label">Avg. savings</span></div>
-      <div class="stat-cell"><span class="stat-num">${cities}</span><span class="stat-label">Locations covered</span></div>
-      <div class="stat-cell"><span class="stat-num">3</span><span class="stat-label">Channels monitored</span></div>`;
+      <div class="metric-card">
+        <div class="metric-icon-box">🔥</div>
+        <div class="metric-info">
+          <span class="metric-value">${totalDeals}</span>
+          <span class="metric-label">Live Deals Today</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon-box">💰</div>
+        <div class="metric-info">
+          <span class="metric-value">${avgDiscount}%</span>
+          <span class="metric-label">Average Savings</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon-box">📍</div>
+        <div class="metric-info">
+          <span class="metric-value">${cities}</span>
+          <span class="metric-label">Locations Covered</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon-box">📡</div>
+        <div class="metric-info">
+          <span class="metric-value">${scrapedCount > 0 ? scrapedCount : 1}</span>
+          <span class="metric-label">Channels Monitored</span>
+        </div>
+      </div>`;
   }
 }
 
